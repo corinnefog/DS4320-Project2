@@ -1,26 +1,15 @@
-"""
-03_merge_deduplicate.py
-Joins USFS and CAL FIRE records on location + date to remove duplicates.
-USFS record is treated as authoritative where conflicts exist.
-Outputs /data/wildfires_merged.csv.
-
-Deduplication tolerance:
-  - Location: within 0.01 degrees (~1 km) in both lat and lon
-  - Date: within 2 days of each other
-"""
-
-import os
+ import os
 import pandas as pd
 import numpy as np
 from scipy.spatial import cKDTree
 
-# ── Config ────────────────────────────────────────────────────────────────────
+# Config 
 DATA_DIR   = "data"
 USFS_PATH  = os.path.join(DATA_DIR, "usfs_california.csv")
 CAL_PATH   = os.path.join(DATA_DIR, "calfire_incidents.csv")
 OUT_PATH   = os.path.join(DATA_DIR, "wildfires_merged.csv")
 
-# ── Load ──────────────────────────────────────────────────────────────────────
+# Load 
 print("Loading USFS data...")
 usfs = pd.read_csv(USFS_PATH, parse_dates=["discovery_date"])
 
@@ -30,7 +19,7 @@ cal  = pd.read_csv(CAL_PATH,  parse_dates=["discovery_date"])
 print(f"USFS records:    {len(usfs):,}")
 print(f"CAL FIRE records: {len(cal):,}")
 
-# ── Standardize shared columns ────────────────────────────────────────────────
+# Standardize shared columns 
 # Ensure both have lat, lon, discovery_date, size_acres, size_class, source
 for df in [usfs, cal]:
     df["discovery_date"] = pd.to_datetime(df["discovery_date"], errors="coerce")
@@ -41,7 +30,7 @@ for df in [usfs, cal]:
 usfs = usfs.dropna(subset=["latitude", "longitude", "discovery_date"])
 cal  = cal.dropna(subset=["latitude", "longitude", "discovery_date"])
 
-# ── Spatial deduplication using KD-tree ──────────────────────────────────────
+#  Spatial deduplication using KD-tree 
 LOC_TOL_DEG  = 0.01   # ~1 km
 DATE_TOL_DAY = 2
 
@@ -78,7 +67,7 @@ cal_unique["source"] = "calfire"
 print(f"Duplicate records removed from CAL FIRE: {cal['is_duplicate'].sum():,}")
 print(f"Unique CAL FIRE records retained:        {len(cal_unique):,}")
 
-# ── Align columns and concatenate ─────────────────────────────────────────────
+# Align columns and concatenate 
 shared_cols = [
     "id", "fire_year", "discovery_date", "discovery_doy",
     "cause", "size_acres", "size_class",
@@ -102,7 +91,7 @@ merged = pd.concat(
     ignore_index=True
 )
 
-# ── Final cleanup ─────────────────────────────────────────────────────────────
+# Final cleanup 
 merged = merged.dropna(subset=["size_acres", "latitude", "longitude"])
 merged["size_class"] = merged["size_class"].fillna(
     merged["size_acres"].apply(
@@ -116,3 +105,4 @@ print(merged["size_class"].value_counts())
 
 merged.to_csv(OUT_PATH, index=False)
 print(f"\nSaved merged dataset to {OUT_PATH}")
+
