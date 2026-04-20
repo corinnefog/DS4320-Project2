@@ -1,23 +1,3 @@
-"""
-07_load_mongo.py
-Loads the final enriched wildfire dataset into MongoDB Atlas.
-Each row becomes one document in the 'wildfires' collection of the
-'wildfire_project' database.
-
-Documents follow the schema defined in the project metadata:
-{
-    id, source, fire_year, discovery_date, discovery_doy,
-    cause, size_acres, size_class, agency,
-    location: { latitude, longitude, county },
-    weather:  { temp_max_c, wind_speed_ms, relative_humidity, vpd_kpa, precip_mm },
-    topography: { elevation_m, slope_deg, aspect_deg },
-    proximity: { dist_road_m, dist_structure_m }
-}
-
-Usage:
-    Set MONGO_URI environment variable or paste URI directly (do not commit).
-    python 07_load_mongo.py
-"""
 
 import os
 import math
@@ -25,7 +5,7 @@ import pandas as pd
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 
-# ── Config ────────────────────────────────────────────────────────────────────
+# Config 
 DATA_DIR   = "data"
 IN_PATH    = os.path.join(DATA_DIR, "wildfires_proximity.csv")
 DB_NAME    = "wildfire_project"
@@ -35,7 +15,7 @@ CHUNK_SIZE = 500
 # Load URI from environment variable (recommended) or paste here
 MONGO_URI = os.environ.get("MONGO_URI", "YOUR_MONGO_URI_HERE")
 
-# ── Connect ───────────────────────────────────────────────────────────────────
+# Connect 
 print("Connecting to MongoDB Atlas...")
 client = MongoClient(MONGO_URI, server_api=ServerApi("1"))
 try:
@@ -47,11 +27,11 @@ except Exception as e:
 db  = client[DB_NAME]
 col = db[COLLECTION]
 
-# ── Load data ─────────────────────────────────────────────────────────────────
+# Load data 
 df = pd.read_csv(IN_PATH)
 print(f"Loaded {len(df):,} records from {IN_PATH}")
 
-# ── Convert rows to documents ─────────────────────────────────────────────────
+# Convert rows to documents 
 def safe_float(val):
     """Return float or None (never NaN — Mongo doesn't accept NaN)."""
     try:
@@ -100,13 +80,13 @@ def row_to_doc(row):
 docs = [row_to_doc(row) for _, row in df.iterrows()]
 print(f"Converted {len(docs):,} rows to documents.")
 
-# ── Drop existing collection and reload ───────────────────────────────────────
+# Drop existing collection and reload 
 existing = col.count_documents({})
 if existing > 0:
     print(f"Dropping existing collection ({existing:,} documents)...")
     col.drop()
 
-# ── Insert in chunks ──────────────────────────────────────────────────────────
+# Insert in chunks 
 print(f"Inserting {len(docs):,} documents in chunks of {CHUNK_SIZE}...")
 inserted_total = 0
 
@@ -119,7 +99,7 @@ for i in range(0, len(docs), CHUNK_SIZE):
 
 print(f"\nDone. Total documents in collection: {col.count_documents({}):,}")
 
-# ── Create indexes for common query fields ────────────────────────────────────
+#  Create indexes for common query fields 
 print("Creating indexes...")
 col.create_index("id",           unique=True)
 col.create_index("size_class")
@@ -128,7 +108,7 @@ col.create_index("cause")
 col.create_index([("location.latitude", 1), ("location.longitude", 1)])
 print("Indexes created.")
 
-# ── Quick sanity check ────────────────────────────────────────────────────────
+# Quick sanity check 
 print("\nSample document:")
 import pprint
 pprint.pprint(col.find_one({}, {"_id": 0}))
@@ -138,3 +118,4 @@ pipeline = [{"$group": {"_id": "$size_class", "count": {"$sum": 1}}},
             {"$sort":  {"count": -1}}]
 for doc in col.aggregate(pipeline):
     print(f"  {doc['_id']:<10} {doc['count']:>8,}")
+
