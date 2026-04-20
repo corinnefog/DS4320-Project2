@@ -1,14 +1,3 @@
-"""
-05_topo_join.py
-Extracts elevation, slope, and aspect at each fire ignition point using
-the USGS Elevation Point Query Service (no local DEM download required).
-Slope and aspect are derived from the 1/3 arc-second (~10m) 3DEP DEM.
-
-For slope and aspect, we use a local 3x3 neighborhood query around each
-point via the USGS National Map API.
-
-Outputs /data/wildfires_topo.csv
-"""
 
 import os
 import time
@@ -17,7 +6,7 @@ import requests
 import pandas as pd
 import numpy as np
 
-# ── Config ────────────────────────────────────────────────────────────────────
+# Config 
 DATA_DIR = "data"
 IN_PATH  = os.path.join(DATA_DIR, "wildfires_weather.csv")
 OUT_PATH = os.path.join(DATA_DIR, "wildfires_topo.csv")
@@ -25,11 +14,11 @@ OUT_PATH = os.path.join(DATA_DIR, "wildfires_topo.csv")
 ELEVATION_API = "https://epqs.nationalmap.gov/v1/json"
 PAUSE_SEC     = 0.2
 
-# ── Load ──────────────────────────────────────────────────────────────────────
+# Load 
 df = pd.read_csv(IN_PATH)
 print(f"Loaded {len(df):,} records.")
 
-# ── USGS Elevation Point Query ────────────────────────────────────────────────
+# USGS Elevation Point Query 
 def get_elevation(lat, lon):
     """Query USGS EPQS for elevation in meters at a point."""
     params = {
@@ -77,7 +66,7 @@ def get_slope_aspect(lat, lon, delta_deg=0.001):
 
     return round(slope_deg, 2), round(aspect_deg, 2)
 
-# ── Main loop ─────────────────────────────────────────────────────────────────
+# Main loop 
 CHECKPOINT_EVERY = 200
 checkpoint_path  = os.path.join(DATA_DIR, "topo_checkpoint.csv")
 
@@ -109,7 +98,7 @@ for i, row in df.iloc[start_idx:].iterrows():
         done.to_csv(checkpoint_path, index=False)
         print(f"  Checkpoint at {i - start_idx + 1} records.")
 
-# ── Merge and export ──────────────────────────────────────────────────────────
+#  Merge and export 
 result = df.merge(done, on="id", how="left")
 
 print(f"\nTopography join complete.")
