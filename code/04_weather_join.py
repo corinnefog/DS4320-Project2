@@ -1,18 +1,3 @@
-"""
-04_weather_join.py
-Extracts gridMET weather variables at each fire's ignition point and date.
-Uses the gridMET REST API (climatologylab.org) to avoid requiring Google
-Earth Engine authentication.
-
-Variables extracted:
-  - tmmx  : max air temperature (K, converted to C)
-  - vs    : wind speed at 10m (m/s)
-  - rmin  : min relative humidity (%)
-  - vpd   : mean vapor pressure deficit (kPa)
-  - pr    : precipitation (mm)
-
-Outputs /data/wildfires_weather.csv
-"""
 
 import os
 import time
@@ -20,7 +5,7 @@ import requests
 import pandas as pd
 import numpy as np
 
-# ── Config ────────────────────────────────────────────────────────────────────
+# Config 
 DATA_DIR  = "data"
 IN_PATH   = os.path.join(DATA_DIR, "wildfires_merged.csv")
 OUT_PATH  = os.path.join(DATA_DIR, "wildfires_weather.csv")
@@ -29,11 +14,11 @@ GRIDMET_BASE = "https://www.reacchpna.org/thredds/ncss/grid/MET"
 VARIABLES    = ["tmmx", "vs", "rmin", "vpd", "pr"]
 PAUSE_SEC    = 0.3   # be polite to the API
 
-# ── Load ──────────────────────────────────────────────────────────────────────
+#  Load 
 df = pd.read_csv(IN_PATH, parse_dates=["discovery_date"])
 print(f"Loaded {len(df):,} fire records.")
 
-# ── gridMET point query ───────────────────────────────────────────────────────
+#  gridMET point query
 def query_gridmet(lat, lon, date_str, var):
     """
     Query a single gridMET variable at a point and date via the THREDDS
@@ -61,7 +46,7 @@ def query_gridmet(lat, lon, date_str, var):
         pass
     return np.nan
 
-# ── Alternative: use the climatologylab.org API ───────────────────────────────
+#  Alternative: use the climatologylab.org API 
 def query_gridmet_clim(lat, lon, start_date, end_date, var):
     """
     Climatology Lab gridMET API — simpler and more reliable for point queries.
@@ -87,10 +72,7 @@ def query_gridmet_clim(lat, lon, start_date, end_date, var):
         pass
     return np.nan
 
-# ── Main loop ─────────────────────────────────────────────────────────────────
-# For large datasets, process in batches and checkpoint periodically.
-# If the API is slow or rate-limited, consider downloading full-year
-# NetCDF files and using xarray for local extraction instead.
+# Main loop 
 
 weather_cols = {
     "tmmx": [],   # max temp (K -> C)
@@ -132,7 +114,7 @@ for i, row in df.iloc[start_idx:].iterrows():
         done.to_csv(checkpoint_path, index=False)
         print(f"  Checkpoint saved at {i - start_idx + 1} records processed.")
 
-# ── Rename columns and merge back ─────────────────────────────────────────────
+# Rename columns and merge back 
 done = done.rename(columns={
     "tmmx": "temp_max_c",
     "vs":   "wind_speed_ms",
