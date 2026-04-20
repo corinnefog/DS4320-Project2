@@ -1,14 +1,3 @@
-"""
-06_proximity_join.py
-Computes distance (meters) from each fire ignition point to:
-  1. The nearest road    — from US Census TIGER/Line road shapefile
-  2. The nearest structure — from Microsoft US Building Footprints
-
-Both datasets are downloaded automatically if not present.
-Uses a spatial index (STRtree) for efficient nearest-neighbor lookup.
-
-Outputs /data/wildfires_proximity.csv
-"""
 
 import os
 import zipfile
@@ -19,7 +8,7 @@ import geopandas as gpd
 from shapely.geometry import Point
 from shapely.strtree import STRtree
 
-# ── Config ────────────────────────────────────────────────────────────────────
+# Config 
 DATA_DIR   = "data"
 IN_PATH    = os.path.join(DATA_DIR, "wildfires_topo.csv")
 OUT_PATH   = os.path.join(DATA_DIR, "wildfires_proximity.csv")
@@ -42,7 +31,7 @@ BLDG_DIR   = os.path.join(GEO_DIR, "ca_buildings")
 # UTM Zone 10N (EPSG:26910) — meters, appropriate for California
 PROJ_CRS   = "EPSG:26910"
 
-# ── Load fire points ──────────────────────────────────────────────────────────
+#  Load fire points 
 df = pd.read_csv(IN_PATH)
 print(f"Loaded {len(df):,} fire records.")
 
@@ -52,7 +41,7 @@ fire_gdf = gpd.GeoDataFrame(
     crs="EPSG:4326"
 ).to_crs(PROJ_CRS)
 
-# ── Download and load roads ───────────────────────────────────────────────────
+# Download and load roads 
 def download_and_extract(url, zip_path, extract_dir):
     if not os.path.exists(extract_dir):
         print(f"Downloading {os.path.basename(zip_path)}...")
@@ -73,7 +62,7 @@ shp_files = [f for f in os.listdir(TIGER_DIR) if f.endswith(".shp")]
 roads_gdf = gpd.read_file(os.path.join(TIGER_DIR, shp_files[0])).to_crs(PROJ_CRS)
 print(f"Loaded {len(roads_gdf):,} road segments.")
 
-# ── Nearest road distance ─────────────────────────────────────────────────────
+# Nearest road distance 
 print("Building road spatial index...")
 road_geoms  = list(roads_gdf.geometry)
 road_tree   = STRtree(road_geoms)
@@ -88,10 +77,7 @@ for pt in fire_gdf.geometry:
 df["dist_road_m"] = dist_road
 print(f"Road distances computed. Mean: {np.mean(dist_road):,.0f} m")
 
-# ── Download and load building footprints ─────────────────────────────────────
-# Note: the Microsoft building footprints file is large (~500MB).
-# If bandwidth is a concern, use the county-level files instead:
-# https://github.com/microsoft/USBuildingFootprints
+# Download and load building footprints 
 try:
     download_and_extract(BLDG_URL, BLDG_ZIP, BLDG_DIR)
     geojson_files = [f for f in os.listdir(BLDG_DIR) if f.endswith(".geojson") or f.endswith(".json")]
@@ -124,7 +110,7 @@ except Exception as e:
     print("https://github.com/microsoft/USBuildingFootprints")
     df["dist_structure_m"] = np.nan
 
-# ── Export ────────────────────────────────────────────────────────────────────
+# Export 
 df.to_csv(OUT_PATH, index=False)
 print(f"\nSaved proximity-enriched dataset to {OUT_PATH}")
 print(df[["dist_road_m", "dist_structure_m"]].describe().round(1))
