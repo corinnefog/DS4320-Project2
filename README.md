@@ -6,7 +6,7 @@
 **NetID** - qfr4cu
 **DOI** - 
 
-**Press Release** -
+**Press Release** - [Press Release](/Press-Release.md)
 
 **Pipeline** - 
 
@@ -23,7 +23,7 @@
 **Rationale** - The general problem of wildfire risk is vast and encompasses ignition
 probability, spread rate, smoke dispersion, and community exposure. We refined our focus to fire size classification in California for three reasons. First, California has the richest publicly available historical fire record in the country, giving us sufficient labeled examples across all size categories. Second, size at containment is a well-defined, objectively measurable outcome that is recorded consistently in the USFS Fire Occurrence Database, making it a reliable target variable. Third, classifying into three categories rather than predicting exact acreage sidesteps the extreme skewness of fire size distributions  while still producing decision-relevant output for emergency managers choosing between a single engine crew versus a full multi-agency response.
 
-[From Small Spark to Catastrophe: Machine Learning Predicts Which California Wildfires Will Explode in Size](#press-release)
+[Jump to Press Release](/Press-Release.md)
 
 ## Domain Exposition 
 
