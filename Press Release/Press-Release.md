@@ -17,4 +17,4 @@ Using historical wildfire records from California spanning 2000 to 2020, combine
 
 ## Figure 
 
-<img src="/images/press-release.png" alt="lin reg chart">
+<img src="/images/feature_importance.png" alt="lin reg chart">
