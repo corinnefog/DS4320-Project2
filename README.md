@@ -66,7 +66,9 @@ discovery date, final size in acres, cause category, geographic coordinates, and
 The secondary dataset is CAL FIRE's incident history, obtained from the CAL FIRE Statistics portal (fire.ca.gov/stats-events). CAL FIRE is the primary state agency responsible for fire protection on over 31 million acres of California's privately owned wildlands, and its incident records complement the federal USFS data by capturing fires on state and private lands that may be underrepresented in the federal database. CAL FIRE records include incident name, county, acres, containment date, and structures threatened or destroyed. The two datasets were joined on approximate location (latitude/longitude within a 0.01 degree tolerance) and discovery date (within 2 days) to deduplicate fires that appear in both sources, with the USFS record treated as authoritative
 where conflicts existed. Weather covariates (temperature, wind speed, relative humidity, vapor pressure deficit) at the time and location of each ignition were joined from the gridMET reanalysis product via Google Earth Engine. Topographic features (slope, elevation, aspect) were extracted from the USGS 3DEP 30-meter DEM. Proximity to roads and structures was computed using California road network shapefiles from the US Census TIGER/Line dataset.
 
-**Code** - | File | Description | Link |
+**Code** - 
+
+| File | Description | Link |
 |------|-------------|-------|
 | `01_acquire_usfs.py` | Downloads the USFS SQLite database, filters to California records, exports to CSV | [repo/01_acquire_usfs.py](https://github.com/corinnefog/DS4320-Project2/blob/main/code/01_acquire_usfs.py) |
 | `02_acquire_calfire.py` | Scrapes and cleans the CAL FIRE incident history CSV from the stats portal | [repo/02_acquire_calfire.py](https://github.com/corinnefog/DS4320-Project2/blob/main/code/02_acquire_calfire.py) |
