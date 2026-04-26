@@ -10,7 +10,7 @@
 
 **Pipeline** - 
 
-**License** - 
+**License** -  [MIT LICENSE](/LICENSE.md)
 
 ## Problem Definition 
 
