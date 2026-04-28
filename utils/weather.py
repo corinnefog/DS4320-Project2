@@ -1,3 +1,4 @@
+#One-time helper to recover and save weather data from API checkpoint after interruption
 import pandas as pd
 import os
 
