@@ -52,11 +52,6 @@ def get_elevation(lat, lon):
     return np.nan
 
 def get_slope_aspect(lat, lon, delta_deg=0.001):
-    """
-    Approximate slope (degrees) and aspect (degrees from north) using
-    a 3-point finite difference of elevations from USGS EPQS.
-    delta_deg ~ 100m spacing at California latitudes.
-    """
     e_center = get_elevation(lat, lon)
     e_east   = get_elevation(lat, lon + delta_deg)
     e_north  = get_elevation(lat + delta_deg, lon)
