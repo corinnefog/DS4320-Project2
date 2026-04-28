@@ -1,5 +1,18 @@
 import sqlite3
 import pandas as pd
+import logging
+import os
+
+os.makedirs("logs", exist_ok=True)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("logs/01_acquire_usfs.log"),
+        logging.StreamHandler(),
+    ],
+)
+logger = logging.getLogger(__name__)
 
 DB_PATH  = "/Users/corinnefogarty/DS4320/Project-2/data/Data/FPA_FOD_20221014.sqlite"
 OUT_PATH = "/Users/corinnefogarty/DS4320/Project-2/data/usfs_california.csv"
