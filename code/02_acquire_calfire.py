@@ -1,5 +1,18 @@
 import os
 import pandas as pd
+import logging
+import os
+
+os.makedirs("logs", exist_ok=True)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("logs/02_acquire_calfire.log"),
+        logging.StreamHandler(),
+    ],
+)
+logger = logging.getLogger(__name__)
 
 DATA_DIR = "data"
 OUT_PATH = os.path.join(DATA_DIR, "calfire_incidents.csv")
@@ -46,4 +59,5 @@ df["id"]         = [f"CAL-{i:06d}" for i in range(len(df))]
 df.to_csv(OUT_PATH, index=False)
 print(f"Saved {len(df):,} cleaned CAL FIRE records to {OUT_PATH}")
 print(df["size_class"].value_counts())
+
 
