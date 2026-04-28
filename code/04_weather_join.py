@@ -1,12 +1,12 @@
-
 import os
 import time
-import requests
+import logging
 import pandas as pd
 import numpy as np
-import logging
+import xarray as xr
 
 
+# Logging
 os.makedirs("logs", exist_ok=True)
 logging.basicConfig(
     level=logging.INFO,
@@ -18,132 +18,144 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Config 
-DATA_DIR  = "data"
-IN_PATH   = os.path.join(DATA_DIR, "wildfires_merged.csv")
-OUT_PATH  = os.path.join(DATA_DIR, "wildfires_weather.csv")
 
-GRIDMET_BASE = "https://www.reacchpna.org/thredds/ncss/grid/MET"
-VARIABLES    = ["tmmx", "vs", "rmin", "vpd", "pr"]
-PAUSE_SEC    = 0.3   # be polite to the API
+# Config
+DATA_DIR = "data"
+IN_PATH = os.path.join(DATA_DIR, "wildfires_merged.csv")
+OUT_PATH = os.path.join(DATA_DIR, "wildfires_weather.csv")
+CHECKPOINT_PATH = os.path.join(DATA_DIR, "weather_checkpoint.csv")
 
-#  Load 
-df = pd.read_csv(IN_PATH, parse_dates=["discovery_date"])
-print(f"Loaded {len(df):,} fire records.")
+VARIABLES = ["tmmx", "vs", "rmin", "vpd", "pr"]
 
-#  gridMET point query
-def query_gridmet(lat, lon, date_str, var):
-    """
-    Query a single gridMET variable at a point and date via the THREDDS
-    NetCDF Subset Service. Returns the float value or NaN on failure.
-    """
-    year  = date_str[:4]
-    url   = f"{GRIDMET_BASE}/{var}/{var}_{year}.nc"
-    params = {
-        "var":         var,
-        "latitude":    lat,
-        "longitude":   lon,
-        "time":        f"{date_str}T00:00:00Z",
-        "accept":      "csv",
-        "point":       "true",
-    }
-    try:
-        r = requests.get(url, params=params, timeout=30)
-        if r.status_code == 200:
-            lines = r.text.strip().split("\n")
-            # CSV response: header row + data row
-            if len(lines) >= 2:
-                val = float(lines[-1].split(",")[-1])
-                return val
-    except Exception:
-        pass
-    return np.nan
-
-#  Alternative: use the climatologylab.org API 
-# Error handling function in case previous one doesn't work
-def query_gridmet_clim(lat, lon, start_date, end_date, var):
-    """
-    Climatology Lab gridMET API — simpler and more reliable for point queries.
-    Returns a single float (the value on start_date) or NaN.
-    """
-    url = "https://www.climatologylab.org/wget-gridmet.html"
-    api_url = (
-        f"https://climate.northwestknowledge.net/METDATA/data/"
-        f"{var}/{var}_{start_date[:4]}.nc"
-        f"?var={var}&lat={lat}&lon={lon}"
-        f"&start={start_date}&end={end_date}&type=gridmet"
-    )
-    try:
-        r = requests.get(api_url, timeout=30)
-        if r.status_code == 200:
-            lines = [l for l in r.text.strip().split("\n") if l and not l.startswith("#")]
-            if len(lines) >= 2:
-                return float(lines[-1].split(",")[-1])
-    except Exception:
-        pass
-    return np.nan
-
-# Main loop 
-
-weather_cols = {
-    "tmmx": [],   # max temp (K -> C)
-    "vs":   [],   # wind speed m/s
-    "rmin": [],   # min relative humidity %
-    "vpd":  [],   # vapor pressure deficit kPa
-    "pr":   [],   # precipitation mm
+VAR_MAP = {
+    "tmmx": "air_temperature",
+    "vs": "wind_speed",
+    "rmin": "relative_humidity",
+    "vpd": "mean_vapor_pressure_deficit",
+    "pr": "precipitation_amount",
 }
 
-CHECKPOINT_EVERY = 500
-checkpoint_path  = os.path.join(DATA_DIR, "weather_checkpoint.csv")
+CHECKPOINT_EVERY = 50
+PAUSE_SEC = 0.02
+
+
+# Load data
+df = pd.read_csv(
+    IN_PATH,
+    parse_dates=["discovery_date"],
+    dtype={"id": str},
+    low_memory=False
+)
+
+# Use sample so script doesn't take too long
+df = df.sample(3000, random_state=42).reset_index(drop=True)
+
+print(f"Loaded {len(df):,} fire records.")
+
+
+def query_gridmet_xarray(lat, lon, date_str, var):
+    """
+    Query one gridMET variable for one fire record.
+    Returns the value or NaN if it fails.
+    """
+    year = date_str[:4]
+    url = f"https://thredds.northwestknowledge.net/thredds/dodsC/MET/{var}/{var}_{year}.nc"
+
+    try:
+        ds = xr.open_dataset(url)
+        ds_var = VAR_MAP[var]
+
+        val = ds[ds_var].sel(
+            day=np.datetime64(date_str),
+            lat=lat,
+            lon=lon,
+            method="nearest"
+        ).values.item()
+
+        ds.close()
+
+        return round(float(val), 3)
+
+    except Exception as e:
+        print(f"Failed for {var}, {date_str}, {lat}, {lon}: {e}")
+        return np.nan
+
 
 # Resume from checkpoint if it exists
-if os.path.exists(checkpoint_path):
-    done = pd.read_csv(checkpoint_path)
+if os.path.exists(CHECKPOINT_PATH):
+    done = pd.read_csv(CHECKPOINT_PATH, dtype={"id": str})
     start_idx = len(done)
     print(f"Resuming from checkpoint at row {start_idx}.")
 else:
-    done      = pd.DataFrame()
+    done = pd.DataFrame()
     start_idx = 0
 
+
+# Main loop
 for i, row in df.iloc[start_idx:].iterrows():
+    processed = i - start_idx + 1
+    total_remaining = len(df) - start_idx
+
+    if processed % 10 == 0:
+        print(f"Processing row {processed}/{total_remaining}...")
+
     date_str = str(row["discovery_date"])[:10]
-    lat, lon = row["latitude"], row["longitude"]
-    record   = {"id": row["id"]}
+    lat = row["latitude"]
+    lon = row["longitude"]
+
+    record = {"id": str(row["id"])}
 
     for var in VARIABLES:
-        val = query_gridmet_clim(lat, lon, date_str, date_str, var)
+        val = query_gridmet_xarray(lat, lon, date_str, var)
         record[var] = val
         time.sleep(PAUSE_SEC)
 
-    # Convert temperature from Kelvin to Celsius
-    if not np.isnan(record.get("tmmx", np.nan)):
-        record["tmmx"] = round(record["tmmx"] - 273.15, 2)
-
     done = pd.concat([done, pd.DataFrame([record])], ignore_index=True)
 
-    if (i - start_idx + 1) % CHECKPOINT_EVERY == 0:
-        done.to_csv(checkpoint_path, index=False)
-        print(f"  Checkpoint saved at {i - start_idx + 1} records processed.")
+    if processed % CHECKPOINT_EVERY == 0:
+        done.to_csv(CHECKPOINT_PATH, index=False)
+        print(f"Checkpoint saved at {len(done)} records processed.")
 
-# Rename columns and merge back 
+
+# Save final checkpoint
+done.to_csv(CHECKPOINT_PATH, index=False)
+
+
+# Rename columns
 done = done.rename(columns={
     "tmmx": "temp_max_c",
-    "vs":   "wind_speed_ms",
+    "vs": "wind_speed_ms",
     "rmin": "relative_humidity",
-    "vpd":  "vpd_kpa",
-    "pr":   "precip_mm",
+    "vpd": "vpd_kpa",
+    "pr": "precip_mm",
 })
 
+
+# Make sure merge ids match
+df["id"] = df["id"].astype(str)
+done["id"] = done["id"].astype(str)
+
+
+# Merge back
 result = df.merge(done, on="id", how="left")
 
-print(f"\nWeather join complete.")
-print(f"Records with full weather data: {result['temp_max_c'].notna().sum():,}")
-print(f"Records missing weather data:   {result['temp_max_c'].isna().sum():,}")
 
+print("\nWeather join complete.")
+print(f"Records with temperature data: {result['temp_max_c'].notna().sum():,}")
+print(f"Records missing temperature data: {result['temp_max_c'].isna().sum():,}")
+
+print("\nWeather preview:")
+print(result[[
+    "id",
+    "temp_max_c",
+    "wind_speed_ms",
+    "relative_humidity",
+    "vpd_kpa",
+    "precip_mm"
+]].head())
+
+
+# Save output
 result.to_csv(OUT_PATH, index=False)
-print(f"Saved to {OUT_PATH}")
-
-# Clean up checkpoint
-if os.path.exists(checkpoint_path):
-    os.remove(checkpoint_path)
+print(f"\nSaved to {OUT_PATH}")
 
