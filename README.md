@@ -1,6 +1,7 @@
 # DS4320-Project2 - Predicting Wildfire Risk
 
-**Executive Summary** -
+**Executive Summary** - This repository contains all materials for a data science project that predicts how large a California wildfire will become based on conditions at the time it is first reported. Using records of over 7,000 wildfires reported between 2000 
+and 2020, a model was built that classifies each fire as small (under 100 acres), medium (100 to 999 acres), or large (1,000 acres or more) using information about where and when the fire started, the terrain it started on, and what caused it. The goal is to give fire managers a data-driven signal in the first moments of a new fire so they can decide how aggressively to respond before the fire grows out of control. This repository includes the raw data pipeline used to collect and clean the data, the database where the data is stored, a machine learning model built to make the predictions, charts showing what the model learned and how well it performed, and a press release written for a general audience explaining the findings.
 
 **Name** - Corinne Fogarty
 
@@ -22,8 +23,7 @@
 
 **Motivation** - California has experienced a dramatic increase in the frequency and severity of wildfires over the past two decades, driven by prolonged drought, rising temperatures, and expanding development into fire-prone wildland areas. The 2018 Camp Fire, the 2020 August Complex Fire, and the 2021 Dixie Fire each burned over 900,000 acres and caused devastating loss of life and property. Despite advances in satellite monitoring and weather forecasting, fire managers still struggle to anticipate which ignitions will remain small and containable versus which will escalate into landscape-scale disasters. Early and accurate size prediction, even a coarse small/medium/large classification, could meaningfully improve how crews and aircraft are pre-positioned in the critical first hours of a fire, when suppression has the greatest chance of success.
 
-**Rationale** - The general problem of wildfire risk is vast and encompasses ignition
-probability, spread rate, smoke dispersion, and community exposure. We refined our focus to fire size classification in California for three reasons. First, California has the richest publicly available historical fire record in the country, giving us sufficient labeled examples across all size categories. Second, size at containment is a well-defined, objectively measurable outcome that is recorded consistently in the USFS Fire Occurrence Database, making it a reliable target variable. Third, classifying into three categories rather than predicting exact acreage sidesteps the extreme skewness of fire size distributions  while still producing decision-relevant output for emergency managers choosing between a single engine crew versus a full multi-agency response.
+**Rationale** - The general problem of wildfire risk is vast and encompasses ignition probability, spread rate, smoke dispersion, and community exposure. I refined our focus to fire size classification in California for three reasons. First, California has the richest publicly available historical fire record in the country, giving us sufficient labeled examples across all size categories. Second, size at containment is a well-defined, objectively measurable outcome that is recorded consistently in the USFS Fire Occurrence Database, making it a reliable target variable. Third, classifying into three categories rather than predicting exact acreage sidesteps the extreme skewness of fire size distributions  while still producing decision-relevant output for emergency managers choosing between a single engine crew versus a full multi-agency response.
 
 [Jump to Press Release](/Press-Release.md)
 
