@@ -13,7 +13,7 @@ California experienced over 8,000 wildfires per year on average over the past de
 
 ## Solution Description
 
-Using historical wildfire records from California spanning 2000 to 2020, combined with topographic characteristics and the day of year and location of each ignition, we trained a Random Forest model to classify whether a newly reported fire will grow into a small (under 100 acres), medium (100–999 acres), or large (1,000+ acres) fire. The model identified day of year and geographic location as the strongest predictors of fire size — fires discovered later in the fire season and in certain regions of California are significantly more likely to become large. The model gives emergency managers an early signal at the time of ignition, before size is known, so resources can be pre-positioned accordingly.
+Using historical wildfire records from California spanning 2000 to 2020, combined with topographic characteristics and the day of year and location of each ignition, a Random Forest model was trained to classify whether a newly reported fire will grow into a small (under 100 acres), medium (100–999 acres), or large (1,000+ acres) fire. The model identified day of year and geographic location as the strongest predictors of fire size — fires discovered later in the fire season and in certain regions of California are significantly more likely to become large. The model gives emergency managers an early signal at the time of ignition, before size is known, so resources can be pre-positioned accordingly.
 
 ## Figure 
 
