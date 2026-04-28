@@ -4,6 +4,19 @@ import math
 import pandas as pd
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
+import logging
+
+
+os.makedirs("logs", exist_ok=True)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("logs/07_load_mongo.log"),
+        logging.StreamHandler(),
+    ],
+)
+logger = logging.getLogger(__name__)
 
 # Config 
 DATA_DIR   = "data"
@@ -12,8 +25,8 @@ DB_NAME    = "wildfire_project"
 COLLECTION = "wildfires"
 CHUNK_SIZE = 500
 
-# Load URI from environment variable (recommended) or paste here
-MONGO_URI = os.environ.get("MONGO_URI", "YOUR_MONGO_URI_HERE")
+
+MONGO_URI =  "mongodb+srv://dbuser:KvLaSyjsD4IrDzze@cluster0.zkz187c.mongodb.net/?appName=Cluster0"
 
 # Connect 
 print("Connecting to MongoDB Atlas...")
