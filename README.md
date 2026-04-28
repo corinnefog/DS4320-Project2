@@ -6,7 +6,7 @@
 
 **NetID** - qfr4cu
 
-**DOI** - [![DOI](https://zenodo.org/badge/1215510729.svg)](https://doi.org/10.5281/zenodo.19838718)
+**DOI** - [[DOI](https://zenodo.org/badge/1215510729.svg)](https://doi.org/10.5281/zenodo.19838718)
 
 **Press Release** - [Press Release](/Press-Release.md)
 
