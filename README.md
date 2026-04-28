@@ -1,9 +1,11 @@
-# DS4320-Project2 - Predicting Tide Levels
+# DS4320-Project2 - Predicting Wildfire Risk
 
 **Executive Summary** -
 
 **Name** - Corinne Fogarty
+
 **NetID** - qfr4cu
+
 **DOI** - 
 
 **Press Release** - [Press Release](/Press-Release.md)
