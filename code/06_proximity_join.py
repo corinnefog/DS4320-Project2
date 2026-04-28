@@ -1,3 +1,5 @@
+#Intended to compute distance to nearest road and structure using 
+#Census TIGER shapefiles; excluded from final pipeline due to broken upstream URL (404). Fields set to NaN in final dataset.
 
 import os
 import zipfile
@@ -7,6 +9,18 @@ import pandas as pd
 import geopandas as gpd
 from shapely.geometry import Point
 from shapely.strtree import STRtree
+import logging
+
+os.makedirs("logs", exist_ok=True)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("logs/06_proximity_join.log"),
+        logging.StreamHandler(),
+    ],
+)
+logger = logging.getLogger(__name__)
 
 # Config 
 DATA_DIR   = "data"
@@ -114,3 +128,4 @@ except Exception as e:
 df.to_csv(OUT_PATH, index=False)
 print(f"\nSaved proximity-enriched dataset to {OUT_PATH}")
 print(df[["dist_road_m", "dist_structure_m"]].describe().round(1))
+
