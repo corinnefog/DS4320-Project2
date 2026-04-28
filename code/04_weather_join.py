@@ -4,6 +4,19 @@ import time
 import requests
 import pandas as pd
 import numpy as np
+import logging
+
+
+os.makedirs("logs", exist_ok=True)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("logs/04_weather_join.log"),
+        logging.StreamHandler(),
+    ],
+)
+logger = logging.getLogger(__name__)
 
 # Config 
 DATA_DIR  = "data"
@@ -47,15 +60,13 @@ def query_gridmet(lat, lon, date_str, var):
     return np.nan
 
 #  Alternative: use the climatologylab.org API 
+# Error handling function in case previous one doesn't work
 def query_gridmet_clim(lat, lon, start_date, end_date, var):
     """
     Climatology Lab gridMET API — simpler and more reliable for point queries.
     Returns a single float (the value on start_date) or NaN.
     """
     url = "https://www.climatologylab.org/wget-gridmet.html"
-    # Direct download URL format for climatologylab gridMET
-    # Format: https://climate.northwestknowledge.net/METDATA/data/{var}/{var}_{year}.nc
-    # We use the OpenDAP/REST endpoint instead
     api_url = (
         f"https://climate.northwestknowledge.net/METDATA/data/"
         f"{var}/{var}_{start_date[:4]}.nc"
@@ -135,3 +146,4 @@ print(f"Saved to {OUT_PATH}")
 # Clean up checkpoint
 if os.path.exists(checkpoint_path):
     os.remove(checkpoint_path)
+
