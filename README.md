@@ -48,7 +48,7 @@ and 2020, a model was built that classifies each fire as small (under 100 acres)
 
 **Project Domain** -  This project lives at the intersection of environmental data science, emergency management, and climate science. Wildfire behavior is governed by the "fire triangle", fuel, weather, and topography, and modern fire science has developed rich quantitative models of how each factor contributes to ignition and spread. California's fire regime is particularly complex because it spans multiple climate zones, from the Mediterranean coast to the Sierra Nevada to the Mojave Desert, each with distinct vegetation types and seasonal fire patterns. The state's fire history is managed across several agencies including CAL FIRE, the US Forest Service, and the National Park Service, each of which maintains records that feed into national databases. Machine learning approaches to fire behavior prediction have grown substantially in the past decade as high-resolution weather reanalysis products and satellite-derived vegetation indices have made it possible to assemble feature-rich training datasets at scale.
 
-**Reading Folder** - [Readings Folder](https://myuva-my.sharepoint.com/:f:/g/personal/qfr4cu_virginia_edu/IgCI8y42M-pvRoZ9reI1JRHnAa0dva5V36e4qFwq9nKmPAw?e=2ObG4h)
+**Reading Folder** - [Readings Folder](https://myuva-my.sharepoint.com/:f:/g/personal/qfr4cu_virginia_edu/IgCI8y42M-pvRoZ9reI1JRHnAStzLWiOPXA5pPUOZfEn6mI?e=EUblos)
 
 **Reading Table** - 
 
