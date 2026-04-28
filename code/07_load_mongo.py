@@ -26,7 +26,7 @@ COLLECTION = "wildfires"
 CHUNK_SIZE = 500
 
 
-MONGO_URI =  "mongodb+srv://dbuser:KvLaSyjsD4IrDzze@cluster0.zkz187c.mongodb.net/?appName=Cluster0"
+MONGO_URI =  "mongodb+srv://<username>:<password>@cluster0.zkz187c.mongodb.net/?appName=Cluster0"
 
 # Connect 
 print("Connecting to MongoDB Atlas...")
