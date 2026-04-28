@@ -1,5 +1,3 @@
-#Intended to compute distance to nearest road and structure using 
-#Census TIGER shapefiles; excluded from final pipeline due to broken upstream URL (404). Fields set to NaN in final dataset.
 
 import os
 import zipfile
@@ -32,7 +30,7 @@ os.makedirs(GEO_DIR, exist_ok=True)
 
 # California FIPS code = 06
 # TIGER primary roads (S1100) for California
-TIGER_URL  = "https://www2.census.gov/geo/tiger/TIGER2023/PRIMARYROADS/tl_2023_06_prisecroads.zip"
+TIGER_URL = "https://www2.census.gov/geo/tiger/TIGER2023/PRIMARYROADS/tl_2023_us_primaryroads.zip"
 TIGER_ZIP  = os.path.join(GEO_DIR, "ca_roads.zip")
 TIGER_DIR  = os.path.join(GEO_DIR, "ca_roads")
 
@@ -128,4 +126,3 @@ except Exception as e:
 df.to_csv(OUT_PATH, index=False)
 print(f"\nSaved proximity-enriched dataset to {OUT_PATH}")
 print(df[["dist_road_m", "dist_structure_m"]].describe().round(1))
-
