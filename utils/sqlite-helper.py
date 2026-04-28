@@ -1,3 +1,4 @@
+#One-time utility to extract and inspect the USFS SQLite database structure
 import zipfile
 import os
 
