@@ -1,4 +1,4 @@
-# DS4320-Project2 - Predicting Wildfire Risk
+# DS4320-Project2 - Predicting Wildfire Risk :fire:
 
 **Executive Summary** - This repository contains all materials for a data science project that predicts how large a California wildfire will become based on conditions at the time it is first reported. Using records of over 7,000 wildfires reported between 2000 
 and 2020, a model was built that classifies each fire as small (under 100 acres), medium (100 to 999 acres), or large (1,000 acres or more) using information about where and when the fire started, the terrain it started on, and what caused it. The goal is to give fire managers a data-driven signal in the first moments of a new fire so they can decide how aggressively to respond before the fire grows out of control. This repository includes the raw data pipeline used to collect and clean the data, the database where the data is stored, a machine learning model built to make the predictions, charts showing what the model learned and how well it performed, and a press release written for a general audience explaining the findings.
