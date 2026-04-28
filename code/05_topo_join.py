@@ -5,6 +5,19 @@ import math
 import requests
 import pandas as pd
 import numpy as np
+import logging
+
+os.makedirs("logs", exist_ok=True)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("logs/05_topo_join.log"),
+        logging.StreamHandler(),
+    ],
+)
+logger = logging.getLogger(__name__)
+
 
 # Config 
 DATA_DIR = "data"
@@ -110,3 +123,4 @@ print(f"Saved to {OUT_PATH}")
 
 if os.path.exists(checkpoint_path):
     os.remove(checkpoint_path)
+
