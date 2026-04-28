@@ -1,7 +1,20 @@
- import os
+import os
 import pandas as pd
 import numpy as np
 from scipy.spatial import cKDTree
+import logging
+import os
+
+os.makedirs("logs", exist_ok=True)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("logs/03_merge_deduplicate.log"),
+        logging.StreamHandler(),
+    ],
+)
+logger = logging.getLogger(__name__)
 
 # Config 
 DATA_DIR   = "data"
@@ -105,4 +118,5 @@ print(merged["size_class"].value_counts())
 
 merged.to_csv(OUT_PATH, index=False)
 print(f"\nSaved merged dataset to {OUT_PATH}")
+
 
