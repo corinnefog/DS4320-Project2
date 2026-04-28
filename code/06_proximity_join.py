@@ -29,18 +29,17 @@ GEO_DIR    = os.path.join(DATA_DIR, "geo")
 os.makedirs(GEO_DIR, exist_ok=True)
 
 # California FIPS code = 06
-# TIGER primary roads (S1100) for California
+# TIGER census data for primary roads (S1100) for California
 TIGER_URL = "https://www2.census.gov/geo/tiger/TIGER2023/PRIMARYROADS/tl_2023_us_primaryroads.zip"
 TIGER_ZIP  = os.path.join(GEO_DIR, "ca_roads.zip")
 TIGER_DIR  = os.path.join(GEO_DIR, "ca_roads")
 
-# Microsoft Building Footprints (California GeoJSON — large file ~500MB)
-# Hosted on Azure blob storage by Microsoft
+# Microsoft Building Footprints hosted on azure blob storage
 BLDG_URL   = "https://minedbuildings.blob.core.windows.net/global-buildings/2023-04-25/California.zip"
 BLDG_ZIP   = os.path.join(GEO_DIR, "ca_buildings.zip")
 BLDG_DIR   = os.path.join(GEO_DIR, "ca_buildings")
 
-# UTM Zone 10N (EPSG:26910) — meters, appropriate for California
+# UTM Zone 10N (EPSG:26910) 
 PROJ_CRS   = "EPSG:26910"
 
 #  Load fire points 
@@ -75,11 +74,10 @@ roads_gdf = gpd.read_file(os.path.join(TIGER_DIR, shp_files[0])).to_crs(PROJ_CRS
 print(f"Loaded {len(roads_gdf):,} road segments.")
 
 # Nearest road distance 
-print("Building road spatial index...")
 road_geoms  = list(roads_gdf.geometry)
 road_tree   = STRtree(road_geoms)
 
-print("Computing distance to nearest road...")
+#Compute road distance
 dist_road = []
 for pt in fire_gdf.geometry:
     nearest_idx  = road_tree.nearest(pt)
